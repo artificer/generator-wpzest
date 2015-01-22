@@ -1,0 +1,10 @@
+{
+  "name": "generator-wpzest",
+  "version": "0.1.0",
+  "description": "WordPress Plugin Boilerplate generator based on YeoPress",
+  "keywords": ["yeoman-wordpress", "yeoman-wpzest"],
+  "dependencies": {
+  	"yeoman-generator": "^0.17.3",
+  	"generator-wordpress": "^1.4.3"
+  }
+}
