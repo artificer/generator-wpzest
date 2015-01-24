@@ -9,6 +9,9 @@
   "dependencies": {
     "yeoman-generator": "^0.18.6",
     "generator-wordpress": "^1.4.3",
-	  "underscore.string": "^3.0.1"
+    "underscore.string": "^3.0.1",
+    "gulp-if": "^1.2.5",
+    "event-stream": "^3.2.1",
+    "gulp-rename": "^1.2.0"
   }
 }
