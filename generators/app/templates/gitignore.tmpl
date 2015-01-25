@@ -1,0 +1,91 @@
+# As Yeoman assumes the usage of Bower and Grunt, ignore the below:
+bower_components
+node_modules
+
+# Ignore automatically generated cruft
+*.log
+.sass-cache
+
+# Ignore config
+wp-config-*
+local-config.php
+<% if (YPConf.get('ignoreWPCore')) { %>
+wp-config.php
+<% } %>
+
+# Operating system files
+.Spotlight-V100
+.Trashes
+.DS_Store
+.DS_Store?
+ehthumbs.db
+Thumbs.db
+
+# Vagrant
+.vagrant
+
+# WordPress + popular plugin generated — adapted from:
+# https://github.com/github/gitignore/blob/master/WordPress.gitignore
+sitemap.xml
+sitemap.xml.gz
+<%
+contentDirs = [
+	'/advanced-cache.php',
+	'/backup-db/',
+	'/backups/',
+	'/blogs.dir/',
+	'/cache/',
+	'/uploads/',
+	'/upgrade/',
+	'/wp-cache-config.php'
+];
+for (var i in contentDirs) {
+	print(YPConf.get('contentDir') + contentDirs[i] + '\n');
+}
+
+if (YPConf.get('ignoreWPCore')) {
+	print('# WordPress Core\n');
+	wpDir = (YPConf.get('wpDir') == '.') ? '' : YPConf.get('wpDir');
+	wpDirs = [
+		'/db-config.php',
+		'/index.php',
+		'/license.txt',
+		'/readme.html',
+		'/wp-activate.php',
+		'/wp-app.php',
+		'/wp-atom.php',
+		'/wp-blog-header.php',
+		'/wp-comments-post.php',
+		'/wp-commentsrss2.php',
+		'/wp-config-sample.php',
+		'/wp-cron.php',
+		'/wp-feed.php',
+		'/wp-links-opml.php',
+		'/wp-load.php',
+		'/wp-login.php',
+		'/wp-mail.php',
+		'/wp-rdf.php',
+		'/wp-rss.php',
+		'/wp-rss2.php',
+		'/wp-pass.php',
+		'/wp-register.php',
+		'/wp-settings.php',
+		'/wp-signup.php',
+		'/wp-trackback.php',
+		'/xmlrpc.php',
+		'/wp-admin',
+		'/wp-includes',
+		'/wp-content/index.php',
+		'/wp-content/plugins/hello.php',
+		'/wp-content/plugins/index.php',
+		'/wp-content/themes/index.php',
+		'/wp-content/themes/twentyten',
+		'/wp-content/themes/twentyeleven',
+		'/wp-content/themes/twentytwelve',
+		'/wp-content/themes/twentythirteen'
+	];
+	for (var i in wpDirs) {
+		print(wpDir + wpDirs[i] + '\n');
+	}
+}
+%>
