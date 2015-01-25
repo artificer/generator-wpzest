@@ -5,7 +5,7 @@ var yeoman   = require('yeoman-generator'),
     Config   = require('../../util/config'),
     // rename   = require('../../util/renamer'),
     rename   = require('gulp-rename'),
-    Replacer = require('../../util/Replacer'),
+    replace  = require('../../util/wppb-replace'),
     YPConfig = require('../../node_modules/generator-wordpress/util/config'),
     YPLogger = require('../../node_modules/generator-wordpress/util/log');
 
@@ -51,12 +51,13 @@ Generator.prototype.specifyMe = function() {
 	function getInput() {
 		me.prompt(require('./prompts')(me.pluginSlug, me.conf.get()), function(input) {
 			me.prompt([{
-				message: 'Does this all look correct?',
+				message: 'Does all this look correct?',
 				name: 'confirm',
 				type: 'confirm'
 			}], function(i) {
 				if (i.confirm) {
 					me.input = input;
+					me.input.pluginSlug = me.pluginSlug;
 					//TODO: save plugin configuration to .wpzest
 					done();
 				} else {
@@ -82,16 +83,17 @@ Generator.prototype.getTheStuff = function() {
 
 	this.registerTransformStream(
 		rename(function (path) {
-			console.log(path);
 			path.basename = path.basename.replace('plugin-name', me.pluginSlug);
 		})
 	);
+
+	this.registerTransformStream(replace(me.input));
 
 	this.remote('tommcfarlin', 'WordPress-Plugin-Boilerplate', 'master', function(err, remote) {
 	  remote.directory('plugin-name/trunk', me.destPath);
 		
 		me.logger.verbose('WordPress Plugin boilerplte downloaded.');
-		me.files = {
+		/*me.files = {
 			bootstrap: new Replacer(me.destPath + '/' + me.pluginSlug + '.php', me),
 			uninstall: new Replacer(me.destPath + '/uninstall.php', me),
 			readme:    new Replacer(me.destPath + '/README.txt', me),
@@ -109,48 +111,7 @@ Generator.prototype.getTheStuff = function() {
 			adminJS:    new Replacer(me.destPath + '/admin/js/' + me.pluginSlug + '-admin.js', me),
 			adminCSS:   new Replacer(me.destPath + '/admin/css/' + me.pluginSlug + '-admin.css', me),
 			language: new Replacer(me.destPath + '/languages/' + me.pluginSlug + '.pot', me)
-		};
-/*
-		me.fs.commit([
-				rename({src: 'plugin-name', dest: me.pluginSlug})		
-			], function() {
-				console.log('fs done');
-			}
-		);*/
-
-		
-
-		// me.fs.move(me.destPath + '/plugin-name.php', me.files.bootstrap.file);
-	 //  me.fs.move(me.destPath + '/includes/class-plugin-name.php', me.files.core.file);  
-	 //  me.fs.move(me.destPath + '/includes/class-plugin-name-activator.php', me.files.activator.file);  
-	 //  me.fs.move(me.destPath + '/includes/class-plugin-name-deactivator.php', me.files.deactivator.file);  
-	 //  me.fs.move(me.destPath + '/includes/class-plugin-name-loader.php', me.files.loader.file);  
-	 //  me.fs.move(me.destPath + '/includes/class-plugin-name-i18n.php', me.files.i18n.file);  
-	 //  me.fs.move(me.destPath + '/public/class-plugin-name-public.php', me.files.publicClass.file);
-	 //  me.fs.move(me.destPath + '/public/partials/plugin-name-public-display.php', me.files.publicView.file);
-	 //  me.fs.move(me.destPath + '/public/js/plugin-name-public.js', me.files.publicJS.file);
-	 //  me.fs.move(me.destPath + '/public/css/plugin-name-public.css', me.files.publicCSS.file);
-	 //  me.fs.move(me.destPath + '/admin/class-plugin-name-admin.php', me.files.adminClass.file);
-	 //  me.fs.move(me.destPath + '/admin/partials/plugin-name-admin-display.php', me.files.adminView.file);
-	 //  me.fs.move(me.destPath + '/admin/js/plugin-name-admin.js', me.files.adminJS.file);
-	 //  me.fs.move(me.destPath + '/admin/css/plugin-name-admin.css', me.files.adminCSS.file);
-	 //  me.fs.move(me.destPath + '/languages/plugin-name.pot', me.files.language.file);
-
-		/*fs.rename(me.destPath + '/plugin-name.php', me.files.bootstrap.file, cb);
-	  fs.rename(me.destPath + '/includes/class-plugin-name.php', me.files.core.file, cb);  
-	  fs.rename(me.destPath + '/includes/class-plugin-name-activator.php', me.files.activator.file, cb);  
-	  fs.rename(me.destPath + '/includes/class-plugin-name-deactivator.php', me.files.deactivator.file, cb);  
-	  fs.rename(me.destPath + '/includes/class-plugin-name-loader.php', me.files.loader.file, cb);  
-	  fs.rename(me.destPath + '/includes/class-plugin-name-i18n.php', me.files.i18n.file, cb);  
-	  fs.rename(me.destPath + '/public/class-plugin-name-public.php', me.files.publicClass.file, cb);
-	  fs.rename(me.destPath + '/public/partials/plugin-name-public-display.php', me.files.publicView.file, cb);
-	  fs.rename(me.destPath + '/public/js/plugin-name-public.js', me.files.publicJS.file, cb);
-	  fs.rename(me.destPath + '/public/css/plugin-name-public.css', me.files.publicCSS.file, cb);
-	  fs.rename(me.destPath + '/admin/class-plugin-name-admin.php', me.files.adminClass.file, cb);
-	  fs.rename(me.destPath + '/admin/partials/plugin-name-admin-display.php', me.files.adminView.file, cb);
-	  fs.rename(me.destPath + '/admin/js/plugin-name-admin.js', me.files.adminJS.file, cb);
-	  fs.rename(me.destPath + '/admin/css/plugin-name-admin.css', me.files.adminCSS.file, cb);
-	  fs.rename(me.destPath + '/languages/plugin-name.pot', me.files.language.file, cb);*/
+		};*/
 
 		done();
 	});

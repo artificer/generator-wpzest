@@ -21,8 +21,6 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-var fs = require('fs');
-
 var Replacer = module.exports = function Replacer(file, options) {
   var module = {},
     searches = [];
@@ -35,35 +33,18 @@ var Replacer = module.exports = function Replacer(file, options) {
     searches.push({search: search, replace: ''});
   };
 
-  module.file = file;
+  // module.file = file;
 
-  // Base replacements
-  module.add(/plugin-name/g, options.pluginSlug);
-  module.add(/Plugin_Name_Admin/g, options.pluginClassName + '_Admin');
-  module.add(/Plugin_Name/g, options.pluginClassName);
-  module.add(/Plugin Name\./g, options.pluginName);
-  module.add(/Your Name <email@example\.com>/g, options.author + ' <' + options.authorEmail + '>');
-  module.add(/1\.0\.0/g, options.pluginVersion);
-  module.add(/Your Name or Company Name/g, options.pluginCopyright);
+  module.replace = function (data) {
 
-  module.replace = function () {
-    fs.readFile(file, 'utf8', function (err, data) {
-      var i, total;
-      if (err) {
-        return console.log(err);
-      }
+    var i, total;
+    total = searches.length;
 
-      total = searches.length;
-      for (i = 0; i < total; i += 1) {
-        data = data.replace(searches[i].search, searches[i].replace);
-      }
+    for (i = 0; i < total; i += 1) {
+      data = data.replace(searches[i].search, searches[i].replace);
+    }
 
-      fs.writeFile(file, data, 'utf8', function (err) {
-        if (err) {
-          return console.log(err);
-        }
-      });
-    });
+    return data;
   };
 
   return module;
