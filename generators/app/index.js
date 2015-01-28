@@ -1,6 +1,8 @@
 var yeoman   = require('yeoman-generator'),
     util     = require('util'),
-    YPConfig = require('../../node_modules/generator-wordpress/util/config');
+    Config   = require('../../util/config'),
+    YPConfig = require('../../node_modules/generator-wordpress/util/config'),
+    YPLogger = require('../../node_modules/generator-wordpress/util/log');
 
 // Export the module
 module.exports = Generator;
@@ -11,24 +13,60 @@ function Generator(args, options, config) {
 
   this.option('skip-yp');
 
-	this.YPConf = new YPConfig();
-}
-util.inherits(Generator, yeoman.generators.Base);
-
-Generator.prototype.fireItUp = function() {
-
-	if(this.options.skipYp) {
-		//TODO: Check if YeoPress has already been initalised and 
-		//throw error if not
-		return;
-	}
-
-	this.composeWith('wordpress', {}, {
-	  local: require.resolve('generator-wordpress')
+	// Log level option
+	this.option('log', {
+		desc: 'The log verbosity level: [ verbose | log | warn | error ]',
+		defaults: 'log',
+		alias: 'l',
+		name: 'level'
 	});
+
+	// Setup the logger
+	this.logger = YPLogger({
+		level: this.options.log
+	});
+
+	// Load the WPZest config
+	this.conf   = new Config();
+	if(this.option.skipYp) {
+		//TODO warn if .yeopress doesn't exist
+	  this.YPConf = new YPConfig();
+	}
+}
+util.inherits(Generator, yeoman.Base);
+
+Generator.prototype.initializing = {
+	WP: function() {
+		console.log(yeoman);
+
+		var me = this;
+
+		if(this.options.skipYp) {
+			//TODO: Check if YeoPress has already been initalised and 
+			//throw error if not
+			return;
+		}
+
+		/*this.composeWith('wordpress', {}, {
+		  local: require.resolve('generator-wordpress')
+		});*/
+
+		this.YPConf = new YPConfig();
+		var generator;
+		var WPGen = require('generator-wordpress');
+		WPGen.resolved = require.resolve('generator-wordpress');
+		WPGen.namespace = 'wordpress';
+		generator = this.env.instantiate(WPGen, {});
+	  generator.run(function() {
+	  	me.YPConf = new YPConfig();
+	  	me._moreFire();
+	  });
+	}
 };
 
-Generator.prototype.turnUpTheConfigHeat = function() {
+Generator.prototype._moreFire = function() {
+
+	console.log("turn up the heat");
 	
 	var done = this.async();
 
@@ -45,4 +83,34 @@ Generator.prototype.turnUpTheConfigHeat = function() {
 	this.template('wp-config.php.tmpl', 'wp-config.php');
 	this.template('wp-config-local.php.tmpl', 'wp-config-local.php');
 	this.template('gitignore.tmpl', '.gitignore');
+
+	this._WPDeploy();
+};
+
+Generator.prototype._WPDeploy = function() {
+	// This is an async step
+	var done = this.async(),
+		  me   = this;
+
+	function getInput() {
+		//TODO load answers from previous input
+		me.prompt(require('./prompts')(me.pluginSlug, me.conf.get()), function(input) {
+			me.prompt([{
+				message: 'Does all this look correct?',
+				name: 'confirm',
+				type: 'confirm'
+			}], function(i) {
+				if (i.confirm) {
+					me.deployInput = input;
+					//TODO: save configuration to .wpzest
+					done();
+				} else {
+					console.log();
+					getInput();
+				}
+			});
+		});
+	}
+
+	getInput();
 };

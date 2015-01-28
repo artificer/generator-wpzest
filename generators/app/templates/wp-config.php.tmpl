@@ -69,7 +69,9 @@ if (!defined('DB_COLLATE')) {
  * You can have multiple installations in one database if you give each a unique
  * prefix. Only numbers, letters, and underscores please!
  */
-$table_prefix  = '<%= YPConf.get('tablePrefix') %>';
+if( !isset($table_prefix) ) {
+  $table_prefix  = '<%= YPConf.get('tablePrefix') %>';
+}
 
 /**
  * WordPress Localized Language, defaults to English.
