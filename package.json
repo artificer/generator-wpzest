@@ -4,11 +4,13 @@
   "description": "WordPress Plugin Boilerplate generator based on YeoPress",
   "keywords": [
     "yeoman-wordpress",
-    "yeoman-wpzest"
+    "yeoman-wpzest",
+    "worpress",
+    "plugin"
   ],
   "dependencies": {
     "yeoman-generator": "^0.18.6",
-    "generator-wordpress": "^1.4.3",
+    "generator-wordpress": "citrusmist/YeoPress",
     "underscore.string": "^3.0.1",
     "gulp-if": "^1.2.5",
     "event-stream": "^3.2.1",
