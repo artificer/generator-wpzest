@@ -1,6 +1,7 @@
 var yeoman   = require('yeoman-generator'),
     util     = require('util'),
     Config   = require('../../util/config'),
+    git      = require('simple-git')(),
     YPConfig = require('../../node_modules/generator-wordpress/util/config'),
     YPLogger = require('../../node_modules/generator-wordpress/util/log');
 
@@ -28,7 +29,7 @@ function Generator(args, options, config) {
 
 	// Load the WPZest config
 	this.conf   = new Config();
-	if(this.option.skipYp) {
+	if(this.options.skipYp) {
 		//TODO warn if .yeopress doesn't exist
 	  this.YPConf = new YPConfig();
 	}
@@ -37,13 +38,13 @@ util.inherits(Generator, yeoman.Base);
 
 Generator.prototype.initializing = {
 	WP: function() {
-		console.log(yeoman);
 
 		var me = this;
 
 		if(this.options.skipYp) {
 			//TODO: Check if YeoPress has already been initalised and 
 			//throw error if not
+			this._WPDeploy();
 			return;
 		}
 
@@ -51,7 +52,6 @@ Generator.prototype.initializing = {
 		  local: require.resolve('generator-wordpress')
 		});*/
 
-		this.YPConf = new YPConfig();
 		var generator;
 		var WPGen = require('generator-wordpress');
 		WPGen.resolved = require.resolve('generator-wordpress');
@@ -59,10 +59,81 @@ Generator.prototype.initializing = {
 		generator = this.env.instantiate(WPGen, {});
 	  generator.run(function() {
 	  	me.YPConf = new YPConfig();
-	  	me._moreFire();
+	  	me._WPDeploy();
 	  });
 	}
 };
+
+Generator.prototype._WPDeploy = function() {
+	
+	// This is an async step
+	var done = this.async(),
+		  me   = this;
+
+	function getInput(defaults) {
+
+		defaults = defaults || me.conf.get();
+
+		me.prompt(require('./prompts')(defaults), function(input) {
+			me.prompt([{
+				message: 'Does all this look correct?',
+				name: 'confirm',
+				type: 'confirm'
+			}], function(i) {
+				if (i.confirm) {
+					me.deployInput = input;
+					console.log(me.deployInput);
+					me.conf.set(input);
+					me._installDeploy();
+					done();
+				} else {
+					getInput(input);
+				}
+			});
+		});
+	}
+
+	getInput();	
+	// this._installDeploy();
+};
+
+Generator.prototype._installDeploy = function() {
+
+	var me   = this,
+		  done = this.async();
+
+	if(!this.conf.get('hasStaging') && !this.conf.get('hasProduction')) {
+		this._moreFire();
+		return;
+	}
+
+	this.logger.log('Installing WP-CLI-Deploy');
+
+	this.remote('c10b10', 'wp-cli-deploy', function(err, remote) {
+		remote.directory('.', me.YPConf.get('wpDir') + '/wp-cli-deploy');
+		me.logger.log('WP-CLI-Deploy installed!');
+		done();
+	});
+
+	this._configureDeploy();	
+};
+
+Generator.prototype._configureDeploy = function() {
+
+	this.template('wp-cli.local.yml.tmpl', 'wp-cli.local.yml');
+	this.template('wp-config-deploy.php.tmpl', 'wp-config-deploy.php');
+
+	if(this.conf.get('hasStaging')) {
+		this.template('wp-config-staging.tmp.tmpl', 'wp-config-staging.tmp');		
+	}
+
+	if(this.conf.get('hasProduction')) {
+		this.template('wp-config-production.tmp.tmpl', 'wp-config-production.tmp');
+	}
+
+	this._moreFire();
+};
+
 
 Generator.prototype._moreFire = function() {
 
@@ -84,33 +155,32 @@ Generator.prototype._moreFire = function() {
 	this.template('wp-config-local.php.tmpl', 'wp-config-local.php');
 	this.template('gitignore.tmpl', '.gitignore');
 
-	this._WPDeploy();
+	this._gitMeUp();
 };
 
-Generator.prototype._WPDeploy = function() {
-	// This is an async step
-	var done = this.async(),
-		  me   = this;
+Generator.prototype._gitMeUp = function() {
 
-	function getInput() {
-		//TODO load answers from previous input
-		me.prompt(require('./prompts')(me.pluginSlug, me.conf.get()), function(input) {
-			me.prompt([{
-				message: 'Does all this look correct?',
-				name: 'confirm',
-				type: 'confirm'
-			}], function(i) {
-				if (i.confirm) {
-					me.deployInput = input;
-					//TODO: save configuration to .wpzest
-					done();
-				} else {
-					console.log();
-					getInput();
-				}
-			});
-		});
+	var me       = this,
+		  done     = this.async(),
+		  message = "Augment YeoPress scaffold";
+
+	if(!this.YPConf.get('git')) {
+		return;
+	} 
+
+	if(this.conf.get('hasStaging') || this.conf.get('hasProduction')) {
+		message += " and setup WP-CLI-Deploy";
 	}
 
-	getInput();
+	git.add('.', function(err) {
+			if (err) me.logger.error(err);
+		}).add('wp-cli-deploy', function(err) {
+			if (err) me.logger.error(err);
+		}).commit(message, function(err, d) {
+			if (err) me.logger.error(err);
+			
+			me.logger.verbose('Git add and commit complete: ' + JSON.stringify(d, null, '  '));
+			done();
+		});
+
 };
