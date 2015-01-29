@@ -91,36 +91,7 @@ Generator.prototype.getTheStuff = function() {
 
 	this.remote('tommcfarlin', 'WordPress-Plugin-Boilerplate', 'master', function(err, remote) {
 	  remote.directory('plugin-name/trunk', me.destPath);
-		
 		me.logger.verbose('WordPress Plugin boilerplte downloaded.');
-		/*me.files = {
-			bootstrap: new Replacer(me.destPath + '/' + me.pluginSlug + '.php', me),
-			uninstall: new Replacer(me.destPath + '/uninstall.php', me),
-			readme:    new Replacer(me.destPath + '/README.txt', me),
-			core:        new Replacer(me.destPath + '/includes/class-' + me.pluginSlug + '.php', me),    
-			activator:   new Replacer(me.destPath + '/includes/class-' + me.pluginSlug + '-activator.php', me),    
-			deactivator: new Replacer(me.destPath + '/includes/class-' + me.pluginSlug + '-deactivator.php', me),    
-			loader:      new Replacer(me.destPath + '/includes/class-' + me.pluginSlug + '-loader.php', me),    
-			i18n:        new Replacer(me.destPath + '/includes/class-' + me.pluginSlug + '-i18n.php', me),    
-			publicClass: new Replacer(me.destPath + '/public/class-' + me.pluginSlug + '-public.php', me),
-			publicView:  new Replacer(me.destPath + '/public/partials/' + me.pluginSlug + '-public-display.php', me),
-			publicJS:    new Replacer(me.destPath + '/public/js/' + me.pluginSlug + '-public.js', me),
-			publicCSS:   new Replacer(me.destPath + '/public/css/' + me.pluginSlug + '-public.css', me),
-			adminClass: new Replacer(me.destPath + '/admin/class-' + me.pluginSlug + '-admin.php', me),
-			adminView:  new Replacer(me.destPath + '/admin/partials/' + me.pluginSlug + '-admin-display.php', me),
-			adminJS:    new Replacer(me.destPath + '/admin/js/' + me.pluginSlug + '-admin.js', me),
-			adminCSS:   new Replacer(me.destPath + '/admin/css/' + me.pluginSlug + '-admin.css', me),
-			language: new Replacer(me.destPath + '/languages/' + me.pluginSlug + '.pot', me)
-		};*/
-
 		done();
 	});
-};
-
-Generator.prototype.nameThoseBabies = function() {
-
-	
-
-  
-
 };
