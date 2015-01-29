@@ -21,7 +21,7 @@ if ( file_exists( dirname( __FILE__ ) . '/wp-config-local.php' ) ) {
   define('WP_DEBUG', true);
   define('WP_DEBUG_LOG', true);
 
-  include( dirname( __FILE__ ) . 'wp-config-local.php' );
+  include( dirname( __FILE__ ) . '/wp-config-local.php' );
 
 } elseif ( file_exists( dirname( __FILE__ ) . '/wp-config-staging.php' ) ) {
 
@@ -30,7 +30,7 @@ if ( file_exists( dirname( __FILE__ ) . '/wp-config-local.php' ) ) {
   define('WP_DEBUG', true);
   define('WP_DEBUG_LOG', true);
 
-  include( dirname( __FILE__ ) . 'wp-config-staging.php' );
+  include( dirname( __FILE__ ) . '/wp-config-staging.php' );
 
 } elseif ( file_exists( dirname( __FILE__ ) . '/wp-config-production.php' ) ) {
 
@@ -38,8 +38,13 @@ if ( file_exists( dirname( __FILE__ ) . '/wp-config-local.php' ) ) {
   define('WP_ENV', 'production');
   define('WP_DEBUG', false);
 
-  include( dirname( __FILE__ ) . 'wp-config-production.php' );
+  include( dirname( __FILE__ ) . '/wp-config-production.php' );
 }
+
+if ( file_exists( dirname( __FILE__ ) . '/wp-config-deploy.php' ) ) { 
+  include( dirname( __FILE__ ) . '/wp-config-deploy.php' );
+}
+
 
 /** Database Charset to use in creating database tables. */
 if (!defined('DB_CHARSET')) {

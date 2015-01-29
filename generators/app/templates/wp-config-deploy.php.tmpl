@@ -1,0 +1,46 @@
+<?php 
+//Configuration for wp-cli-deploy
+
+<% if (conf.get('hasStaging')) { %>
+
+define( 'STAGING_URL', '<%= conf.get('stagingUrl') %>' );
+define( 'STAGING_HOST', '<%= conf.get('stagingHost') %>' );
+define( 'STAGING_PORT', '<%= conf.get('stagingPort') %>' );
+define( 'STAGING_USER', '<%= conf.get('stagingUser') %>' );
+define( 'STAGING_PATH', '<%= conf.get('stagingPath') %>' );
+define( 'STAGING_WP_PATH', '<%= conf.get('stagingWpPath') %>' );
+define( 'STAGING_UPLOADS_PATH', '<%= conf.get('stagingUploadsPath') %>' );
+define( 'STAGING_THEMES_PATH', '<%= conf.get('stagingThemesPath') %>' );
+define( 'STAGING_PLUGINS_PATH', '<%= conf.get('stagingPluginsPath') %>' );
+define( 'STAGING_DB_HOST', '<%= conf.get('stagingDbHost') %>' );
+define( 'STAGING_DB_NAME', '<%= conf.get('stagingDbName') %>' );
+define( 'STAGING_DB_USER', '<%= conf.get('stagingDbUser') %>' );
+define( 'STAGING_DB_PASSWORD', '<%= conf.get('stagingDbPass') %>' );
+define( 'STAGING_EXCLUDES', 'node_modules/' );
+define( 'STAGING_POST_HOOK', 
+	'echo "[ -f wp-config-staging.tmp ] && scp wp-config-staging.tmp <%= conf.get('stagingUser') %>@<%= conf.get('stagingHost') %>:<%= conf.get('stagingWpPath') %> && rm wp-config-staging.tmp'
+	);
+
+<% } %>
+
+<% if (conf.get('hasProduction')) { %>
+
+define( 'PRODUCTION_URL', '<%= conf.get('productionUrl') %>' );
+define( 'PRODUCTION_HOST', '<%= conf.get('productionHost') %>' );
+define( 'PRODUCTION_PORT', '<%= conf.get('productionPort') %>' );
+define( 'PRODUCTION_USER', '<%= conf.get('productionUser') %>' );
+define( 'PRODUCTION_PATH', '<%= conf.get('productionPath') %>' );
+define( 'PRODUCTION_WP_PATH', '<%= conf.get('productionWpPath') %>' );
+define( 'PRODUCTION_UPLOADS_PATH', '<%= conf.get('productionUploadsPath') %>' );
+define( 'PRODUCTION_THEMES_PATH', '<%= conf.get('productionThemesPath') %>' );
+define( 'PRODUCTION_PLUGINS_PATH', '<%= conf.get('productionPluginsPath') %>' );
+define( 'PRODUCTION_DB_HOST', '<%= conf.get('productionDbHost') %>' );
+define( 'PRODUCTION_DB_NAME', '<%= conf.get('productionDbName') %>' );
+define( 'PRODUCTION_DB_USER', '<%= conf.get('productionDbUser') %>' );
+define( 'PRODUCTION_DB_PASSWORD', '<%= conf.get('productionDbPass') %>' );
+define( 'PRODUCTION_EXCLUDES', 'node_modules/' );
+define( 'PRODUCTION_POST_HOOK', 
+	'echo "[ -f wp-config-production.tmp ] && scp wp-config-production.tmp <%= conf.get('productionUser') %>@<%= conf.get('productionHost') %>:<%= conf.get('productionWpPath') %> && rm wp-config-production.tmp'
+	);
+
+<% } %>
