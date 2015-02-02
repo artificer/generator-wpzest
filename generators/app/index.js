@@ -174,8 +174,6 @@ Generator.prototype._gitMeUp = function() {
 
 	git.add('.', function(err) {
 			if (err) me.logger.error(err);
-		}).add('wp-cli-deploy', function(err) {
-			if (err) me.logger.error(err);
 		}).commit(message, function(err, d) {
 			if (err) me.logger.error(err);
 			
