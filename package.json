@@ -1,7 +1,7 @@
 {
   "name": "generator-wpzest",
   "version": "0.1.0",
-  "description": "Yeoman generator WordPress and WordPress plugins based on YeoPress and WP Plugin Boilerplate",
+  "description": "Yeoman generator for WordPress and WordPress plugins based on YeoPress and WP Plugin Boilerplate",
   "keywords": [
     "yeoman-wordpress",
     "yeoman-wpzest",
