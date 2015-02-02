@@ -1,6 +1,6 @@
 {
   "name": "generator-wpzest",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Yeoman generator for WordPress and WordPress plugins based on YeoPress and WP Plugin Boilerplate",
   "keywords": [
     "yeoman-wordpress",
@@ -18,7 +18,7 @@
     "gulp-if": "^1.2.5",
     "event-stream": "^3.2.1",
     "gulp-rename": "^1.2.0"
-  }, 
+  },
   "repository": {
     "type": "git",
     "url": "git://github.com/artificer/generator-wpzest.git"
