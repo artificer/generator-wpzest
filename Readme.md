@@ -27,7 +27,7 @@ If you are already using YeoPress and just want to setup deployment then you can
 
 __NOTE__: If you have modified `wp-config.php` and `.gitignore` after using YeoPress and use WPZest after that, WPZest may overwrite these files. Make sure you check them.
 
-	yo wpzest:pluginbg <pluign-name>
+	yo wpzest:pluginbp <pluign-name>
 
 Scaffolds a plugin based on the WP Plugin Boilerplate in your pluigns folder folder.
 
