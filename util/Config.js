@@ -7,8 +7,6 @@ var Config = module.exports = function(locals, globals) {
 	// Default config file name
 	this.filename = '.wpzest';
 
-	console.log(this.filename);
-
 	// Load files
 	this.global = this.load(path.join(process.env.HOME  || process.env.USERPROFILE, this.filename)) || {};
 	this.local  = this.load() || {};

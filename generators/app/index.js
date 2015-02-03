@@ -22,10 +22,17 @@ function Generator(args, options, config) {
 		name: 'level'
 	});
 
+	// Enable advanced features
+	this.option('advanced', {
+		desc: 'Makes advanced features available',
+		alias: 'a'
+	});
+
 	// Setup the logger
 	this.logger = YPLogger({
 		level: this.options.log
 	});
+
 
 	// Load the WPZest config
 	this.conf   = new Config();
@@ -56,7 +63,10 @@ Generator.prototype.initializing = {
 		var WPGen = require('generator-wordpress');
 		WPGen.resolved = require.resolve('generator-wordpress');
 		WPGen.namespace = 'wordpress';
-		generator = this.env.instantiate(WPGen, {});
+		generator = this.env.instantiate(WPGen, { options: {
+			log: this.options.log,
+			advanced: this.options.advanced
+		}});
 	  generator.run(function() {
 	  	me.YPConf = new YPConfig();
 	  	me._WPDeploy();
@@ -82,7 +92,6 @@ Generator.prototype._WPDeploy = function() {
 			}], function(i) {
 				if (i.confirm) {
 					me.deployInput = input;
-					console.log(me.deployInput);
 					me.conf.set(input);
 					me._installDeploy();
 					done();
@@ -137,8 +146,6 @@ Generator.prototype._configureDeploy = function() {
 
 Generator.prototype._moreFire = function() {
 
-	console.log("turn up the heat");
-	
 	var done = this.async();
 
 	/*
