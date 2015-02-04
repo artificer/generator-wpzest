@@ -31,6 +31,13 @@ __NOTE__: If you have modified `wp-config.php` and `.gitignore` after using YeoP
 
 Scaffolds a plugin based on the WP Plugin Boilerplate in your pluigns folder folder.
 
+# Templates
+
+When installing wordpress through YeoPress the default theme is setup to use RequireJS. If this is not your cup of tea there is a fork of the template maintained [here](https://github.com/citrusmist/YeoPress/tree/template) which doesn't rely on RequireJS but will require you to load scripts using `wp_enqueue_script` in your dev environment.
+
+# Resources
+
+* (Slides)[https://speakerdeck.com/artificermil/front-end-workflow-automation-for-wordpress-theme-and-plugin-development] from Front End Workflow Automation for WordPress Theme and Plugin Development talk
 
 
 	
