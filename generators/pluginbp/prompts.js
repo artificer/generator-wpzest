@@ -22,18 +22,26 @@ module.exports = function(slug, defaults) {
 	  }, {
 	    name: 'author',
 	    message: 'What is your name?',
+	    store: true,
 	    default: defaults.author.name || null
 	  }, {
 	  	name: 'authorEmail',
 	    message: 'What is your e-mail?',
+	    store: true,
 	    default: defaults.author.email || null
 	  }, {
 			name: 'authorURI',
 	    message: 'What is your URL?',
+	    store: true,
 	    default: defaults.author.url || null
+		}, {
+			name: 'pluginURI',
+	    message: 'What is the plugin URL?',
+	    default: defaults.pluginURI || null
 		}, {
 			name: 'copyright',
 	    message: 'What goes in copyright tags?',
+	    store: true,
 	    default: defaults.author.copyright || null
 		}, {
 			name: "humanName",

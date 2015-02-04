@@ -61,7 +61,6 @@ Generator.prototype.specifyMe = function() {
 					//TODO: save plugin configuration to .wpzest
 					done();
 				} else {
-					console.log();
 					getInput();
 				}
 			});
@@ -83,7 +82,17 @@ Generator.prototype.getTheStuff = function() {
 
 	this.registerTransformStream(
 		rename(function (path) {
-			path.basename = path.basename.replace('plugin-name', me.pluginSlug);
+			var classSlug = me.input.className.toLowerCase().replace('_', '-');
+
+			if(me.input.classPrefix !== '') {
+				classSlug = me.input.classPrefix.toLowerCase() + '-' + classSlug;
+			}
+
+			if (path.basename.indexOf('class') === -1) {
+				path.basename = path.basename.replace('plugin-name', me.pluginSlug);
+			} else {
+				path.basename = path.basename.replace('plugin-name', classSlug);
+			}
 		})
 	);
 
