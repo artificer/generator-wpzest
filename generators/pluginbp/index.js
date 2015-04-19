@@ -3,7 +3,6 @@ var yeoman   = require('yeoman-generator'),
     fs       = require('fs'),
     gulpif   = require('gulp-if'),
     Config   = require('../../util/config'),
-    // rename   = require('../../util/renamer'),
     rename   = require('gulp-rename'),
     replace  = require('../../util/wppb-replace'),
     YPConfig = require('../../node_modules/generator-wordpress/util/config'),
@@ -42,7 +41,7 @@ util.inherits(Generator, yeoman.generators.Base);
 
 
 // Ask the user what they want done
-Generator.prototype.specifyMe = function() { 
+Generator.prototype._specifyMe = function() { 
 	
 	// This is an async step
 	var done = this.async(),
@@ -71,7 +70,7 @@ Generator.prototype.specifyMe = function() {
 };
 
 
-Generator.prototype.getTheStuff = function() {
+Generator.prototype._getTheStuff = function() {
 
 	var done     = this.async(),
 	    me       = this;
@@ -103,4 +102,19 @@ Generator.prototype.getTheStuff = function() {
 		me.logger.verbose('WordPress Plugin boilerplte downloaded.');
 		done();
 	});
+};
+
+Generator.prototype.gruntMe = function() {
+
+	var done = this.async();
+	fs.readFile('Gruntfile.js', function(err, data) {
+		if (err) {
+			console.log('Error occured');
+		}
+	  console.log(data);
+	});
+
+	var cb = function() {
+
+	};
 };
