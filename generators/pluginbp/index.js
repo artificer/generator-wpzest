@@ -35,13 +35,26 @@ function Generator(args, options, config) {
 	this.YPconf = new YPConfig();
 	// Load the WPZest config
 	this.conf   = new Config();
-	this.destPath = this.destinationPath( this.YPconf.get('contentDir') + '/plugins/' + this.pluginSlug );
+	
+	this.pluginPath = function(file) {
+
+		var path;
+		file = file || '';
+
+		if(file === '') {
+			path = this.destinationPath( this.YPconf.get('contentDir') + '/plugins/' + this.pluginSlug );
+		} else {
+			path = this.destinationPath( this.YPconf.get('contentDir') + '/plugins/' + this.pluginSlug + '/' + file );
+		}
+
+		return path;
+	}; 
 }
 util.inherits(Generator, yeoman.generators.Base);
 
 
 // Ask the user what they want done
-Generator.prototype._specifyMe = function() { 
+Generator.prototype.specifyMe = function() { 
 	
 	// This is an async step
 	var done = this.async(),
@@ -70,7 +83,7 @@ Generator.prototype._specifyMe = function() {
 };
 
 
-Generator.prototype._getTheStuff = function() {
+Generator.prototype.getTheStuff = function() {
 
 	var done     = this.async(),
 	    me       = this;
@@ -97,8 +110,8 @@ Generator.prototype._getTheStuff = function() {
 
 	this.registerTransformStream(replace(me.input));
 
-	this.remote('tommcfarlin', 'WordPress-Plugin-Boilerplate', 'master', function(err, remote) {
-	  remote.directory('plugin-name/trunk', me.destPath);
+	this.remote('DevinVinson', 'WordPress-Plugin-Boilerplate', 'master', function(err, remote) {
+	  remote.directory('plugin-name/trunk', me.pluginPath());
 		me.logger.verbose('WordPress Plugin boilerplte downloaded.');
 		done();
 	});
@@ -106,15 +119,43 @@ Generator.prototype._getTheStuff = function() {
 
 Generator.prototype.gruntMe = function() {
 
-	var done = this.async();
-	fs.readFile('Gruntfile.js', function(err, data) {
-		if (err) {
-			console.log('Error occured');
-		}
-	  console.log(data);
-	});
+	this.logger.verbose('Setting up Grunt.');
 
-	var cb = function() {
+	this.fs.copyTpl(
+		this.templatePath('Gruntfile.js.tmpl'),
+		this.pluginPath('Gruntfile.js'),
+		{gen: this}
+	);
 
-	};
+	this.fs.copyTpl(
+		this.templatePath('package.json.tmpl'),
+		this.pluginPath('package.json'),
+		{gen: this}
+	);
 };
+
+Generator.prototype.bowerMe = function() {
+
+	this.logger.verbose('Setting up Bower.');
+
+	this.fs.copyTpl(
+		this.templatePath('.bowerrc.tmpl'),
+		this.pluginPath('.bowerrc'),
+		{gen: this}
+	);
+
+	this.fs.copyTpl(
+		this.templatePath('bower.json.tmpl'),
+		this.pluginPath('bower.json'),
+		{gen: this}
+	);
+};
+
+Generator.prototype.install = function() {
+
+	this.logger.verbose('Installing packages. This will probably take a minute.');
+	process.chdir(this.pluginPath());
+	this.installDependencies();
+
+};
+

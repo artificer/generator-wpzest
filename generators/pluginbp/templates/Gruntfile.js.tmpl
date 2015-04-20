@@ -1,0 +1,196 @@
+module.exports = function(grunt) {
+	
+	var npmDependencies = require('./package.json').devDependencies;
+
+	grunt.initConfig({
+
+		// Watches for changes and runs tasks
+		watch : {
+			// sass : {
+			// 	files : ['scss/**/*.scss'],
+			// 	tasks : (hasSass) ? ['sass:dev'] : null
+			// },
+			compassPublic: {
+        files: ['public/scss/{,*/}*.{scss,sass}'],
+        tasks: ['compass:server']
+      },
+			jsPublic : {
+				files : ['public/js/*.js', 'public/js/**/*.js', '!public/js/*.min.js'],
+				tasks : ['jshint', 'uglify']
+			},
+			bower : {
+				files : ['public/vendor/**/*.js'],
+				tasks : ['bower_concat']
+			}
+		},
+
+		// JsHint your javascript
+		jshint : {
+			all : ['public/js/*.js', '!public/js/modernizr.js', '!public/js/*.min.js', '!public/js/_bower.js', '!public/vendor/**/*.js'],
+			options : {
+				browser: true,
+				curly: false,
+				eqeqeq: false,
+				eqnull: true,
+				expr: true,
+				immed: true,
+				newcap: true,
+				noarg: true,
+				smarttabs: true,
+				sub: true,
+				undef: false
+			}
+		},
+
+		// Dev and production build for sass
+		sass : {
+			production : {
+				files : [
+					{
+						src : ['**/*.scss', '!**/_*.scss'],
+						cwd : 'scss',
+						dest : 'css',
+						ext : '.css',
+						expand : true
+					}
+				],
+				options : {
+					style : 'compressed'
+				}
+			},
+			dev : {
+				files : [
+					{
+						src : ['**/*.scss', '!**/_*.scss'],
+						cwd : 'scss',
+						dest : 'css',
+						ext : '.css',
+						expand : true
+					}
+				],
+				options : {
+					style : 'expanded'
+				}
+			}
+		},
+
+		compass: {
+      options: {
+        sassDir: 'public/scss',
+        cssDir: 'public/css',
+        generatedImagesDir: 'public/images/generated',
+        imagesDir: 'public/images',
+        javascriptsDir: 'public/js',
+        fontsDir: 'public/css/fonts',
+        importPath: 'public/vendor',
+        httpImagesPath: '/images', //FIXME this should be path to WP plugin
+        httpGeneratedImagesPath: '/images/generated', //FIXME this should be path to WP plugin
+        httpFontsPath: '/css/fonts', //FIXME this should be path to WP plugin
+        relativeAssets: false,
+        sourcemap: true
+      },
+      dist: {},
+      server: {
+        options: {
+          debugInfo: true
+        }
+      }
+    },
+
+    concurrent: {
+      server: [
+        'compass:server'
+      ],
+    },
+
+		bower_concat : {
+			all : {
+				dest: 'public/js/_bower.js',
+				bowerOptions: {
+		      relative: false
+		    }
+		  }
+		},
+
+		uglify: {
+			options: {
+				mangle: false
+			},
+			production: {
+				files: {
+					'public/js/press-public.min.js': ['public/js/_bower.js', 'public/js/**/*.js']
+				}
+			}
+		},
+
+		// Image min
+		imagemin : {
+			production : {
+				files : [
+					{
+						expand: true,
+						cwd: 'images',
+						src: '**/*.{png,jpg,jpeg}',
+						dest: 'images'
+					}
+				]
+			}
+		},
+
+		// SVG min
+		svgmin: {
+			production : {
+				files: [
+					{
+						expand: true,
+						cwd: 'images',
+						src: '**/*.svg',
+						dest: 'images'
+					}
+				]
+			}
+		}
+
+
+	});
+
+	// Default task
+	grunt.registerTask('default', function() {
+		var arr = [];
+
+		arr.push('concurrent:server');
+		arr.push('watch');
+
+		grunt.task.run(arr);
+	});
+
+	// Build task
+	grunt.registerTask('build', function() {
+		var arr = ['jshint'];
+
+		arr.push('compass:dist');
+		// arr.push('sass:production');
+		arr.push('imagemin:production', 'svgmin:production');
+
+		grunt.task.run(arr);
+	});
+
+	// Template Setup Task
+	grunt.registerTask('setup', function() {
+		var arr = [];
+
+		arr.push('compass:server');
+		// arr.push('sass:dev');
+
+		grunt.task.run(arr);
+	});
+
+	grunt.loadNpmTasks('grunt-concurrent');
+	grunt.loadNpmTasks('grunt-contrib-compass');
+	grunt.loadNpmTasks('grunt-contrib-jshint');
+	grunt.loadNpmTasks('grunt-contrib-watch');
+	grunt.loadNpmTasks('grunt-bower-concat');
+	grunt.loadNpmTasks('grunt-contrib-uglify');
+	grunt.loadNpmTasks('grunt-contrib-imagemin');
+	grunt.loadNpmTasks('grunt-svgmin');
+};
