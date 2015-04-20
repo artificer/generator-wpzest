@@ -119,6 +119,8 @@ Generator.prototype.getTheStuff = function() {
 
 Generator.prototype.gruntMe = function() {
 
+	
+
 	this.logger.verbose('Setting up Grunt.');
 
 	this.fs.copyTpl(
@@ -132,6 +134,15 @@ Generator.prototype.gruntMe = function() {
 		this.pluginPath('package.json'),
 		{gen: this}
 	);
+
+	this.fs.write(
+		this.pluginPath('public/scss/' + this.input.pluginSlug + '-public.scss'), 
+		'');
+	this.fs.write(
+		this.pluginPath('admin/scss/' + this.input.pluginSlug + '-admin.scss'), 
+		'');
+
+	
 };
 
 Generator.prototype.bowerMe = function() {
@@ -153,9 +164,20 @@ Generator.prototype.bowerMe = function() {
 
 Generator.prototype.install = function() {
 
+	var createVendors = function(cb) {
+		fs.mkdir('public/vendor', function(err) {
+			if(err) {
+				console.log(err);
+				return cb(err);
+			}
+			cb(null);
+		});
+	};
+
 	this.logger.verbose('Installing packages. This will probably take a minute.');
 	process.chdir(this.pluginPath());
 	this.installDependencies();
+	createVendors.bind(this)(function(err) {});
 
 };
 
