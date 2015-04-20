@@ -10,13 +10,21 @@ module.exports = function(grunt) {
 			// 	files : ['scss/**/*.scss'],
 			// 	tasks : (hasSass) ? ['sass:dev'] : null
 			// },
-			compassPublic: {
+			compassPublic : {
         files: ['public/scss/{,*/}*.{scss,sass}'],
-        tasks: ['compass:server']
+        tasks: ['compass:public']
+      },
+      compassAdmin : {
+        files: ['admin/scss/{,*/}*.{scss,sass}'],
+        tasks: ['compass:admin']
       },
 			jsPublic : {
 				files : ['public/js/*.js', 'public/js/**/*.js', '!public/js/*.min.js'],
-				tasks : ['jshint', 'uglify']
+				tasks : ['jshint:public', 'uglify']
+			},
+			jsAdmin : {
+				files : ['admin/js/*.js', 'admin/js/**/*.js'],
+				tasks : ['jshint:admin']
 			},
 			bower : {
 				files : ['public/vendor/**/*'],
@@ -26,8 +34,10 @@ module.exports = function(grunt) {
 
 		// JsHint your javascript
 		jshint : {
-			all : ['public/js/*.js', '!public/js/modernizr.js', '!public/js/*.min.js', '!public/js/_bower.js', '!public/vendor/**/*.js'],
+			public : ['public/js/*.js', '!public/js/modernizr.js', '!public/js/*.min.js', '!public/js/_bower.js', '!public/vendor/**/*.js'],
+			admin : ['admin/js/*.js', '!admin/js/*.min.js'],
 			options : {
+				predef: ["console"],
 				browser: true,
 				curly: false,
 				eqeqeq: false,
@@ -74,24 +84,41 @@ module.exports = function(grunt) {
 			}
 		},
 
-		compass: {
-      options: {
-        sassDir: 'public/scss',
-        cssDir: 'public/css',
-        generatedImagesDir: 'public/images/generated',
-        imagesDir: 'public/images',
-        javascriptsDir: 'public/js',
-        fontsDir: 'public/css/fonts',
-        importPath: 'public/vendor',
-        httpImagesPath: '/images', //FIXME this should be path to WP plugin
-        httpGeneratedImagesPath: '/images/generated', //FIXME this should be path to WP plugin
-        httpFontsPath: '/css/fonts', //FIXME this should be path to WP plugin
-        relativeAssets: false,
-        sourcemap: true
+		compass : {
+      options : {
+        relativeAssets : false,
+        sourcemap : true
       },
-      dist: {},
-      server: {
+      dist : {},
+      public : {
         options: {
+        	sassDir : 'public/scss',
+	        cssDir : 'public/css',
+	        generatedImagesDir : 'public/images',
+	        imagesDir : 'public/images/original',
+	        javascriptsDir : 'public/js',
+	        fontsDir : 'public/css/fonts',
+	        importPath : 'public/vendor',
+	        //TODO Set httpPath and let the images, fonts and generated be auto determined from it
+	        httpImagesPath : 'wp-content/plugin-name/public/images/original', //FIXME this should be path to WP plugins folder
+	        httpGeneratedImagesPath : 'wp-content/plugin-name/public/images', //FIXME this should be path to WP plugins folder
+	        httpFontsPath : 'wp-content/plugin-name/public/css/fonts', //FIXME this should be path to WP plugins folder
+          debugInfo: true
+        }
+      },
+      admin : {
+        options: {
+        	sassDir : 'admin/scss',
+	        cssDir : 'admin/css',
+	        generatedImagesDir : 'admin/images',
+	        imagesDir : 'admin/images/original',
+	        javascriptsDir : 'admin/js',
+	        fontsDir : 'admin/css/fonts',
+	        // importPath : 'admin/vendor',
+	        //TODO Set httpPath and let the images, fonts and generated be auto determined from it
+	        httpImagesPath : 'wp-content/plugin-name/admin/images/original', //FIXME this should be path to WP plugins folder
+	        httpGeneratedImagesPath : 'wp-content/plugin-name/admin/images', //FIXME this should be path to WP plugins folder
+	        httpFontsPath : 'wp-content/plugin-name/admin/css/fonts', //FIXME this should be path to WP plugins folder
           debugInfo: true
         }
       }
@@ -99,7 +126,8 @@ module.exports = function(grunt) {
 
     concurrent: {
       server: [
-        'compass:server'
+	      'compass:public',
+        'compass:admin'
       ],
     },
 
@@ -168,8 +196,7 @@ module.exports = function(grunt) {
 	grunt.registerTask('build', function() {
 		var arr = ['jshint'];
 
-		arr.push('compass:dist');
-		// arr.push('sass:production');
+		arr.push('compass');
 		arr.push('imagemin:production', 'svgmin:production');
 
 		grunt.task.run(arr);
@@ -179,8 +206,8 @@ module.exports = function(grunt) {
 	grunt.registerTask('setup', function() {
 		var arr = [];
 
-		arr.push('compass:server');
-		// arr.push('sass:dev');
+		arr.push('bower_concat');
+		arr.push('compass');
 
 		grunt.task.run(arr);
 	});
