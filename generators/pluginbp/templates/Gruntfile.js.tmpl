@@ -26,6 +26,14 @@ module.exports = function(grunt) {
 				files : ['admin/js/*.js', 'admin/js/**/*.js'],
 				tasks : ['jshint:admin']
 			},
+			imagePublic : {
+				files : ['public/images/original/*.{png,jpg,jpeg,gif,svg}'],
+				tasks : ['imagemin:public']
+			},
+			imageAdmin : {
+				files : ['admin/images/original/*.{png,jpg,jpeg,gif,svg}'],
+				tasks : ['imagemin:admin']
+			},
 			bower : {
 				files : ['public/vendor/**/*'],
 				tasks : ['bower_concat']
@@ -34,8 +42,6 @@ module.exports = function(grunt) {
 
 		// JsHint your javascript
 		jshint : {
-			public : ['public/js/*.js', '!public/js/modernizr.js', '!public/js/*.min.js', '!public/js/_bower.js', '!public/vendor/**/*.js'],
-			admin : ['admin/js/*.js', '!admin/js/*.min.js'],
 			options : {
 				predef: ["console"],
 				browser: true,
@@ -49,7 +55,9 @@ module.exports = function(grunt) {
 				smarttabs: true,
 				sub: true,
 				undef: false
-			}
+			},
+			public : ['public/js/*.js', '!public/js/modernizr.js', '!public/js/*.min.js', '!public/js/_bower.js', '!public/vendor/**/*.js'],
+			admin : ['admin/js/*.js', '!admin/js/*.min.js']
 		},
 
 		// Dev and production build for sass
@@ -127,7 +135,8 @@ module.exports = function(grunt) {
     concurrent: {
       server: [
 	      'compass:public',
-        'compass:admin'
+        'compass:admin',
+        'imagemin'
       ],
     },
 
@@ -153,32 +162,27 @@ module.exports = function(grunt) {
 
 		// Image min
 		imagemin : {
-			production : {
+			public : {
 				files : [
 					{
 						expand: true,
-						cwd: 'images',
-						src: '**/*.{png,jpg,jpeg}',
-						dest: 'images'
+						cwd: 'public/images/original',
+						src: '{,*/}*.{png,jpg,jpeg,gif,svg}',
+						dest: 'public/images'
 					}
 				]
-			}
-		},
-
-		// SVG min
-		svgmin: {
-			production : {
-				files: [
+			},
+			admin : {
+				files : [
 					{
 						expand: true,
-						cwd: 'images',
-						src: '**/*.svg',
-						dest: 'images'
+						cwd: 'admin/images/original',
+						src: '{,*/}*.{png,jpg,jpeg,gif,svg}',
+						dest: 'admin/images'
 					}
 				]
-			}
-		}
-
+			},
+		},
 
 	});
 
@@ -197,7 +201,7 @@ module.exports = function(grunt) {
 		var arr = ['jshint'];
 
 		arr.push('compass');
-		arr.push('imagemin:production', 'svgmin:production');
+		arr.push('imagemin');
 
 		grunt.task.run(arr);
 	});
