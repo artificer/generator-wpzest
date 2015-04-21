@@ -20,24 +20,27 @@ module.exports = function(grunt) {
       },
 			jsPublic : {
 				files : ['public/js/*.js', 'public/js/**/*.js', '!public/js/*.min.js'],
-				tasks : ['jshint:public', 'uglify']
+				tasks : ['newer:jshint:public', 'uglify']
 			},
 			jsAdmin : {
 				files : ['admin/js/*.js', 'admin/js/**/*.js'],
-				tasks : ['jshint:admin']
+				tasks : ['newer:jshint:admin']
 			},
 			imagePublic : {
 				files : ['public/images/original/*.{png,jpg,jpeg,gif,svg}'],
-				tasks : ['imagemin:public']
+				tasks : ['newer:imagemin:public']
 			},
 			imageAdmin : {
 				files : ['admin/images/original/*.{png,jpg,jpeg,gif,svg}'],
-				tasks : ['imagemin:admin']
+				tasks : ['newer:imagemin:admin']
 			},
 			bower : {
-				files : ['public/vendor/**/*'],
-				tasks : ['bower_concat']
-			},
+				files : ['public/vendor','public/vendor/**','bower.json'],
+				tasks : ['bower_concat'],
+				options : {
+					event : 'all'
+				}
+			}
 		},
 
 		// JsHint your javascript
@@ -136,7 +139,9 @@ module.exports = function(grunt) {
       server: [
 	      'compass:public',
         'compass:admin',
-        'imagemin'
+        'newer:imagemin',
+        'newer:jshint',
+        'newer:uglify'
       ],
     },
 
@@ -217,11 +222,11 @@ module.exports = function(grunt) {
 	});
 
 	grunt.loadNpmTasks('grunt-concurrent');
+	grunt.loadNpmTasks('grunt-newer');
 	grunt.loadNpmTasks('grunt-contrib-compass');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-bower-concat');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-imagemin');
-	grunt.loadNpmTasks('grunt-svgmin');
 };
