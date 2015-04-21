@@ -2,8 +2,13 @@ module.exports = function(grunt) {
 	
 	var npmDependencies = require('./package.json').devDependencies;
 
-	grunt.initConfig({
+	var pluginConfig = {
+		pluginPath : '/<%= gen.YPconf.get("contentDir") %>/plugins/<%= gen.input.pluginSlug %>',
+		pluginSlug : '<%= gen.input.pluginSlug %>'
+	};
 
+	grunt.initConfig({
+		wpzest : pluginConfig,
 		// Watches for changes and runs tasks
 		watch : {
 			// sass : {
@@ -36,10 +41,7 @@ module.exports = function(grunt) {
 			},
 			bower : {
 				files : ['public/vendor','public/vendor/**','bower.json'],
-				tasks : ['bower_concat'],
-				options : {
-					event : 'all'
-				}
+				tasks : ['bower_concat']
 			}
 		},
 
@@ -103,6 +105,7 @@ module.exports = function(grunt) {
       dist : {},
       public : {
         options: {
+        	httpPath : '<%%= wpzest.pluginPath %>/', 
         	sassDir : 'public/scss',
 	        cssDir : 'public/css',
 	        generatedImagesDir : 'public/images',
@@ -110,15 +113,12 @@ module.exports = function(grunt) {
 	        javascriptsDir : 'public/js',
 	        fontsDir : 'public/css/fonts',
 	        importPath : 'public/vendor',
-	        //TODO Set httpPath and let the images, fonts and generated be auto determined from it
-	        httpImagesPath : 'wp-content/plugin-name/public/images/original', //FIXME this should be path to WP plugins folder
-	        httpGeneratedImagesPath : 'wp-content/plugin-name/public/images', //FIXME this should be path to WP plugins folder
-	        httpFontsPath : 'wp-content/plugin-name/public/css/fonts', //FIXME this should be path to WP plugins folder
           debugInfo: true
         }
       },
       admin : {
         options: {
+        	httpPath : '<%%= wpzest.pluginPath %>/', 
         	sassDir : 'admin/scss',
 	        cssDir : 'admin/css',
 	        generatedImagesDir : 'admin/images',
@@ -126,10 +126,6 @@ module.exports = function(grunt) {
 	        javascriptsDir : 'admin/js',
 	        fontsDir : 'admin/css/fonts',
 	        // importPath : 'admin/vendor',
-	        //TODO Set httpPath and let the images, fonts and generated be auto determined from it
-	        httpImagesPath : 'wp-content/plugin-name/admin/images/original', //FIXME this should be path to WP plugins folder
-	        httpGeneratedImagesPath : 'wp-content/plugin-name/admin/images', //FIXME this should be path to WP plugins folder
-	        httpFontsPath : 'wp-content/plugin-name/admin/css/fonts', //FIXME this should be path to WP plugins folder
           debugInfo: true
         }
       }
@@ -160,7 +156,7 @@ module.exports = function(grunt) {
 			},
 			production: {
 				files: {
-					'public/js/press-public.min.js': ['public/js/_bower.js', 'public/js/**/*.js']
+					'public/js/<%%= wpzest.pluginSlug %>-public.min.js': ['public/js/_bower.js', 'public/js/**/*.js']
 				}
 			}
 		},
