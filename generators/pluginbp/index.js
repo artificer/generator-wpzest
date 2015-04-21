@@ -123,7 +123,7 @@ Generator.prototype.gruntMe = function() {
 
 	this.logger.verbose('Setting up Grunt.');
 
-	this.fs.copyTpl(
+	this.template(
 		this.templatePath('Gruntfile.js.tmpl'),
 		this.pluginPath('Gruntfile.js'),
 		{gen: this}
