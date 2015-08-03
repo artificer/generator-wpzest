@@ -120,6 +120,12 @@ module.exports = function(slug, defaults) {
 	          return errmsg;
 	      }
 	    }
+		}, {
+			name: "useGrunt",
+			message: "Use Grunt, Bower and Sass w/ Compass",
+			default: "N",
+			type: "confirm"
 		}
+
 	];
 };

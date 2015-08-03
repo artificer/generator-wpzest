@@ -24,6 +24,8 @@ module.exports = function(options){
   replacer.add(/(Plugin Name:\s*).*/g, '$1' + options.humanName);  
   replacer.add(/(@link\s*).*/g, '$1' + options.pluginURI);
   replacer.add(/(Plugin URI:\s*).*/g, '$1' + options.pluginURI);
+  replacer.add(/'plugin-name'/g, '\'' + options.pluginSlug + '\'');
+  replacer.add(/plugin-name(-\w+)(?=(?:\.css)|(?:\.js))/g, options.pluginSlug + '$1');
 
   function modifyFile(file, cb){
     var str;

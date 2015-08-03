@@ -1,0 +1,228 @@
+module.exports = function(grunt) {
+	
+	var npmDependencies = require('./package.json').devDependencies;
+
+	var pluginConfig = {
+		pluginPath : '/<%= gen.YPconf.get("contentDir") %>/plugins/<%= gen.input.pluginSlug %>',
+		pluginSlug : '<%= gen.input.pluginSlug %>'
+	};
+
+	grunt.initConfig({
+		wpzest : pluginConfig,
+		// Watches for changes and runs tasks
+		watch : {
+			// sass : {
+			// 	files : ['scss/**/*.scss'],
+			// 	tasks : (hasSass) ? ['sass:dev'] : null
+			// },
+			compassPublic : {
+        files: ['public/scss/{,*/}*.{scss,sass}'],
+        tasks: ['compass:public']
+      },
+      compassAdmin : {
+        files: ['admin/scss/{,*/}*.{scss,sass}'],
+        tasks: ['compass:admin']
+      },
+			jsPublic : {
+				files : ['public/js/*.js', 'public/js/**/*.js', '!public/js/*.min.js'],
+				tasks : ['newer:jshint:public', 'uglify']
+			},
+			jsAdmin : {
+				files : ['admin/js/*.js', 'admin/js/**/*.js'],
+				tasks : ['newer:jshint:admin']
+			},
+			imagePublic : {
+				files : ['public/images/original/*.{png,jpg,jpeg,gif,svg}'],
+				tasks : ['newer:imagemin:public']
+			},
+			imageAdmin : {
+				files : ['admin/images/original/*.{png,jpg,jpeg,gif,svg}'],
+				tasks : ['newer:imagemin:admin']
+			},
+			bower : {
+				files : ['public/vendor','public/vendor/**','bower.json'],
+				tasks : ['bower_concat']
+			}
+		},
+
+		// JsHint your javascript
+		jshint : {
+			options : {
+				predef: ["console"],
+				browser: true,
+				curly: false,
+				eqeqeq: false,
+				eqnull: true,
+				expr: true,
+				immed: true,
+				newcap: true,
+				noarg: true,
+				smarttabs: true,
+				sub: true,
+				undef: false
+			},
+			public : ['public/js/*.js', '!public/js/modernizr.js', '!public/js/*.min.js', '!public/js/_bower.js', '!public/vendor/**/*.js'],
+			admin : ['admin/js/*.js', '!admin/js/*.min.js']
+		},
+
+		// Dev and production build for sass
+		sass : {
+			production : {
+				files : [
+					{
+						src : ['**/*.scss', '!**/_*.scss'],
+						cwd : 'scss',
+						dest : 'css',
+						ext : '.css',
+						expand : true
+					}
+				],
+				options : {
+					style : 'compressed'
+				}
+			},
+			dev : {
+				files : [
+					{
+						src : ['**/*.scss', '!**/_*.scss'],
+						cwd : 'scss',
+						dest : 'css',
+						ext : '.css',
+						expand : true
+					}
+				],
+				options : {
+					style : 'expanded'
+				}
+			}
+		},
+
+		compass : {
+      options : {
+        relativeAssets : false,
+        sourcemap : true
+      },
+      dist : {},
+      public : {
+        options: {
+        	httpPath : '<%%= wpzest.pluginPath %>/', 
+        	sassDir : 'public/scss',
+	        cssDir : 'public/css',
+	        generatedImagesDir : 'public/images',
+	        imagesDir : 'public/images/original',
+	        javascriptsDir : 'public/js',
+	        fontsDir : 'public/css/fonts',
+	        importPath : 'public/vendor',
+          debugInfo: true
+        }
+      },
+      admin : {
+        options: {
+        	httpPath : '<%%= wpzest.pluginPath %>/', 
+        	sassDir : 'admin/scss',
+	        cssDir : 'admin/css',
+	        generatedImagesDir : 'admin/images',
+	        imagesDir : 'admin/images/original',
+	        javascriptsDir : 'admin/js',
+	        fontsDir : 'admin/css/fonts',
+	        // importPath : 'admin/vendor',
+          debugInfo: true
+        }
+      }
+    },
+
+    concurrent: {
+      server: [
+	      'compass:public',
+        'compass:admin',
+        'newer:imagemin',
+        'newer:jshint',
+        'newer:uglify'
+      ],
+    },
+
+		bower_concat : {
+			all : {
+				dest: 'public/js/_bower.js',
+				bowerOptions: {
+		      relative: false
+		    }
+		  }
+		},
+
+		uglify: {
+			options: {
+				mangle: false
+			},
+			production: {
+				files: {
+					'public/js/<%%= wpzest.pluginSlug %>-public.min.js': ['public/js/_bower.js', 'public/js/**/*.js']
+				}
+			}
+		},
+
+		// Image min
+		imagemin : {
+			public : {
+				files : [
+					{
+						expand: true,
+						cwd: 'public/images/original',
+						src: '{,*/}*.{png,jpg,jpeg,gif,svg}',
+						dest: 'public/images'
+					}
+				]
+			},
+			admin : {
+				files : [
+					{
+						expand: true,
+						cwd: 'admin/images/original',
+						src: '{,*/}*.{png,jpg,jpeg,gif,svg}',
+						dest: 'admin/images'
+					}
+				]
+			},
+		},
+
+	});
+
+	// Default task
+	grunt.registerTask('default', function() {
+		var arr = [];
+
+		arr.push('concurrent:server');
+		arr.push('watch');
+
+		grunt.task.run(arr);
+	});
+
+	// Build task
+	grunt.registerTask('build', function() {
+		var arr = ['jshint'];
+
+		arr.push('compass');
+		arr.push('imagemin');
+
+		grunt.task.run(arr);
+	});
+
+	// Template Setup Task
+	grunt.registerTask('setup', function() {
+		var arr = [];
+
+		arr.push('bower_concat');
+		arr.push('compass');
+
+		grunt.task.run(arr);
+	});
+
+	grunt.loadNpmTasks('grunt-concurrent');
+	grunt.loadNpmTasks('grunt-newer');
+	grunt.loadNpmTasks('grunt-contrib-compass');
+	grunt.loadNpmTasks('grunt-contrib-jshint');
+	grunt.loadNpmTasks('grunt-contrib-watch');
+	grunt.loadNpmTasks('grunt-bower-concat');
+	grunt.loadNpmTasks('grunt-contrib-uglify');
+	grunt.loadNpmTasks('grunt-contrib-imagemin');
+};

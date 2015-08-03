@@ -3,7 +3,6 @@ var yeoman   = require('yeoman-generator'),
     fs       = require('fs'),
     gulpif   = require('gulp-if'),
     Config   = require('../../util/config'),
-    // rename   = require('../../util/renamer'),
     rename   = require('gulp-rename'),
     replace  = require('../../util/wppb-replace'),
     YPConfig = require('../../node_modules/generator-wordpress/util/config'),
@@ -36,7 +35,20 @@ function Generator(args, options, config) {
 	this.YPconf = new YPConfig();
 	// Load the WPZest config
 	this.conf   = new Config();
-	this.destPath = this.destinationPath( this.YPconf.get('contentDir') + '/plugins/' + this.pluginSlug );
+	
+	this.pluginPath = function(file) {
+
+		var path;
+		file = file || '';
+
+		if(file === '') {
+			path = this.destinationPath( this.YPconf.get('contentDir') + '/plugins/' + this.pluginSlug );
+		} else {
+			path = this.destinationPath( this.YPconf.get('contentDir') + '/plugins/' + this.pluginSlug + '/' + file );
+		}
+
+		return path;
+	}; 
 }
 util.inherits(Generator, yeoman.generators.Base);
 
@@ -98,9 +110,74 @@ Generator.prototype.getTheStuff = function() {
 
 	this.registerTransformStream(replace(me.input));
 
-	this.remote('tommcfarlin', 'WordPress-Plugin-Boilerplate', 'master', function(err, remote) {
-	  remote.directory('plugin-name/trunk', me.destPath);
+	this.remote('DevinVinson', 'WordPress-Plugin-Boilerplate', 'master', function(err, remote) {
+	  remote.directory('plugin-name/trunk', me.pluginPath());
 		me.logger.verbose('WordPress Plugin boilerplte downloaded.');
 		done();
 	});
 };
+
+Generator.prototype.gruntMe = function() {
+
+	
+
+	this.logger.verbose('Setting up Grunt.');
+
+	this.template(
+		this.templatePath('Gruntfile.js.tmpl'),
+		this.pluginPath('Gruntfile.js'),
+		{gen: this}
+	);
+
+	this.fs.copyTpl(
+		this.templatePath('package.json.tmpl'),
+		this.pluginPath('package.json'),
+		{gen: this}
+	);
+
+	this.fs.write(
+		this.pluginPath('public/scss/' + this.input.pluginSlug + '-public.scss'), 
+		'');
+	this.fs.write(
+		this.pluginPath('admin/scss/' + this.input.pluginSlug + '-admin.scss'), 
+		'');
+
+	
+};
+
+Generator.prototype.bowerMe = function() {
+
+	this.logger.verbose('Setting up Bower.');
+
+	this.fs.copyTpl(
+		this.templatePath('.bowerrc.tmpl'),
+		this.pluginPath('.bowerrc'),
+		{gen: this}
+	);
+
+	this.fs.copyTpl(
+		this.templatePath('bower.json.tmpl'),
+		this.pluginPath('bower.json'),
+		{gen: this}
+	);
+};
+
+Generator.prototype.install = function() {
+
+	var createVendors = function(cb) {
+		fs.mkdir('public/vendor', function(err) {
+			if(err) {
+				console.log(err);
+				return cb(err);
+			}
+			cb(null);
+		});
+	};
+
+	this.logger.verbose('Installing packages. This will probably take a minute.');
+	process.chdir(this.pluginPath());
+	this.installDependencies();
+	createVendors.bind(this)(function(err) {});
+
+};
+
